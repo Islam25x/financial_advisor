@@ -6,13 +6,13 @@ import {
   LockKeyhole,
   X,
 } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import logoSrc from "../../assets/logo.png";
-import robotImageSrc from "../../assets/Finixa robot.png";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AuthPasswordField } from "../../features/auth/components/AuthPasswordField";
+import AuthCard from "../../features/auth/components/auth-layout/AuthCard";
+import AuthFlowLayout from "../../features/auth/components/auth-layout/AuthFlowLayout";
 import { useResetPassword } from "../../features/auth/hooks/useResetPassword";
 import { readAuthLinkParam } from "../../shared/auth/auth-link-params";
-import { Button, Card, useToast } from "../../shared/ui";
+import { Button, useToast } from "../../shared/ui";
 
 type ResetPasswordErrors = {
   newPassword?: string;
@@ -132,29 +132,9 @@ export default function ResetPasswordPage() {
   const goToLogin = () => navigate("/", { replace: true });
 
   return (
-    <main className="relative h-screen overflow-hidden bg-[#f6f8ff] text-slate-900">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.14),_transparent_38%),radial-gradient(circle_at_bottom_left,_rgba(125,211,252,0.18),_transparent_28%)]" />
-      <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-8 sm:px-8">
-        <header className="flex items-center justify-between gap-6">
-          <Link to="/welcome" className="inline-flex items-center">
-            <img src={logoSrc} alt="Finexa" className="h-12 w-auto object-contain sm:h-14" />
-          </Link>
-        </header>
-
-        <div className="relative flex flex-1 items-center justify-center py-10">
-          <img
-            src={robotImageSrc}
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute right-[-6%] top-[64%] hidden w-[420px] max-w-[40vw] -translate-y-1/2 opacity-95 xl:block"
-          />
-
-          {resetPasswordMutation.isSuccess ? (
-            <Card
-              variant="elevated"
-              padding="md"
-              className="relative z-10 mx-auto w-full max-w-[420px] rounded-[30px] border border-white/80 bg-white/92 px-5 py-6 shadow-[0_30px_90px_rgba(59,130,246,0.14)] backdrop-blur-xl sm:px-6"
-            >
+    <AuthFlowLayout illustrationClassName="top-[64%]">
+      {resetPasswordMutation.isSuccess ? (
+        <AuthCard size="compact">
               <button
                 type="button"
                 onClick={goToLogin}
@@ -187,13 +167,9 @@ export default function ResetPasswordPage() {
               >
                 Back to sign in
               </Button>
-            </Card>
-          ) : !resetPayload || isInvalidOrExpiredState ? (
-            <Card
-              variant="elevated"
-              padding="md"
-              className="relative z-10 mx-auto w-full max-w-[420px] rounded-[30px] border border-white/80 bg-white/92 px-5 py-6 text-center shadow-[0_30px_90px_rgba(59,130,246,0.14)] backdrop-blur-xl sm:px-6"
-            >
+        </AuthCard>
+      ) : !resetPayload || isInvalidOrExpiredState ? (
+        <AuthCard size="compact" className="text-center">
               <button
                 type="button"
                 onClick={goToLogin}
@@ -223,13 +199,9 @@ export default function ResetPasswordPage() {
               >
                 Back to sign in
               </Button>
-            </Card>
-          ) : (
-            <Card
-              variant="elevated"
-              padding="md"
-              className="relative z-10 mx-auto w-full max-w-[420px] rounded-[30px] border border-white/80 bg-white/92 px-5 py-6 shadow-[0_30px_90px_rgba(59,130,246,0.14)] backdrop-blur-xl sm:px-6"
-            >
+        </AuthCard>
+      ) : (
+        <AuthCard size="default">
               <button
                 type="button"
                 onClick={goToLogin}
@@ -306,16 +278,8 @@ export default function ResetPasswordPage() {
                   Back to sign in
                 </button>
               </div>
-            </Card>
-          )}
-        </div>
-
-        <footer className="pb-4 text-center text-sm text-slate-400">
-          <span>Copyright 2026 Finexa. All rights reserved.</span>
-          <span className="mx-3 hidden sm:inline">Privacy Policy</span>
-          <span className="hidden sm:inline">Terms of Service</span>
-        </footer>
-      </div>
-    </main>
+        </AuthCard>
+      )}
+    </AuthFlowLayout>
   );
 }

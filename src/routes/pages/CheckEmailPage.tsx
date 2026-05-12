@@ -1,14 +1,14 @@
 import { useEffect } from "react";
 import { ArrowRight, Check, Link as LinkIcon, Mail, RefreshCw, Shield } from "lucide-react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import logoSrc from "../../assets/logo.png";
-import robotImageSrc from "../../assets/Finixa robot.png";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import AuthCard from "../../features/auth/components/auth-layout/AuthCard";
+import AuthFlowLayout from "../../features/auth/components/auth-layout/AuthFlowLayout";
 import { useResendConfirmation } from "../../features/auth/hooks/useResendConfirmation";
 import {
   readStoredPendingConfirmationEmail,
   writeStoredPendingConfirmationEmail,
 } from "../../infrastructure/auth/auth-storage";
-import { Button, Card } from "../../shared/ui";
+import { Button } from "../../shared/ui";
 
 const steps = [
   {
@@ -69,10 +69,9 @@ export function CheckEmailPanel({
   };
 
   return (
-    <Card
-      variant="elevated"
-      padding="md"
-      className={`relative z-10 mx-auto w-full max-w-[420px] rounded-[30px] border border-white/80 bg-white/92 px-5 py-5 shadow-[0_30px_90px_rgba(59,130,246,0.14)] backdrop-blur-xl sm:px-6 ${
+    <AuthCard
+      size="compact"
+      className={`px-5 py-5 ${
         embedded ? "" : "sm:py-6"
       }`}
     >
@@ -168,7 +167,7 @@ export function CheckEmailPanel({
           <ArrowRight className="h-4 w-4" />
         </button>
       </div>
-    </Card>
+    </AuthCard>
   );
 }
 
@@ -178,38 +177,17 @@ export default function CheckEmailPage() {
   const email = readEmail(searchParams) || readStoredPendingConfirmationEmail() || "";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f6f8ff] text-slate-900">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.14),_transparent_38%),radial-gradient(circle_at_bottom_left,_rgba(125,211,252,0.18),_transparent_28%)]" />
-      <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-8 sm:px-8">
-        <header className="flex items-center justify-between gap-6">
-          <Link to="/welcome" className="inline-flex items-center">
-            <img src={logoSrc} alt="Finexa" className="h-12 w-auto object-contain sm:h-14" />
-          </Link>
-          <a
-            href="mailto:support@finexa.app"
-            className="hidden text-sm font-medium text-slate-500 transition hover:text-[#2C6BFF] sm:inline-flex"
-          >
-            Need help? <span className="ml-1 text-[#2C6BFF]">Contact Support</span>
-          </a>
-        </header>
-
-        <div className="relative flex flex-1 items-center justify-center py-10">
-          <img
-            src={robotImageSrc}
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute right-[-6%] top-1/2 hidden w-[420px] max-w-[40vw] -translate-y-1/2 opacity-95 xl:block"
-          />
-
-          <CheckEmailPanel email={email} onGoToLogin={() => navigate("/login")} />
-        </div>
-
-        <footer className="pb-4 text-center text-sm text-slate-400">
-          <span>Copyright 2024 Finexa. All rights reserved.</span>
-          <span className="mx-3 hidden sm:inline">Privacy Policy</span>
-          <span className="hidden sm:inline">Terms of Service</span>
-        </footer>
-      </div>
-    </main>
+    <AuthFlowLayout
+      headerAside={
+        <a
+          href="mailto:support@finexa.app"
+          className="hidden text-sm font-medium text-slate-500 transition hover:text-[#2C6BFF] sm:inline-flex"
+        >
+          Need help? <span className="ml-1 text-[#2C6BFF]">Contact Support</span>
+        </a>
+      }
+    >
+      <CheckEmailPanel email={email} onGoToLogin={() => navigate("/login")} />
+    </AuthFlowLayout>
   );
 }
