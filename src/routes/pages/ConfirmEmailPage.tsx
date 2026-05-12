@@ -124,7 +124,7 @@ export default function ConfirmEmailPage() {
   }, [confirmationPayload, isSuccess, showToast]);
 
   return (
-    <AuthFlowLayout>
+    <AuthFlowLayout illustrationVariant="compact">
       {isLoading && (
         <AuthCard size="compact" className="text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#ECF4FF]">

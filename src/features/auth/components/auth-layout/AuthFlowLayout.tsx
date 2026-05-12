@@ -4,11 +4,15 @@ import logoSrc from "../../../../assets/logo.png";
 import { cn } from "../../../../shared/ui/types";
 import AuthIllustration from "./AuthIllustration";
 
+
+type AuthIllustrationVariant = "default" | "compact";
+
 type AuthFlowLayoutProps = {
   children: ReactNode;
   headerAside?: ReactNode;
   footer?: ReactNode;
   illustration?: boolean;
+  illustrationVariant?: AuthIllustrationVariant;
   illustrationClassName?: string;
   contentClassName?: string;
 };
@@ -26,9 +30,11 @@ export default function AuthFlowLayout({
   headerAside,
   footer = DEFAULT_FOOTER,
   illustration = true,
+  illustrationVariant = "default",
   illustrationClassName,
   contentClassName,
 }: AuthFlowLayoutProps) {
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f6f8ff] text-slate-900">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.14),_transparent_38%),radial-gradient(circle_at_bottom_left,_rgba(125,211,252,0.18),_transparent_28%)]" />
@@ -44,7 +50,12 @@ export default function AuthFlowLayout({
         <div
           className={cn("relative flex flex-1 items-center justify-center py-10", contentClassName)}
         >
-          {illustration ? <AuthIllustration className={illustrationClassName} /> : null}
+          {illustration ? (
+            <AuthIllustration
+              variant={illustrationVariant}
+              className={illustrationClassName}
+            />
+          ) : null}
           {children}
         </div>
 

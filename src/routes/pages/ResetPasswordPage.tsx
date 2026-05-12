@@ -132,7 +132,7 @@ export default function ResetPasswordPage() {
   const goToLogin = () => navigate("/", { replace: true });
 
   return (
-    <AuthFlowLayout illustrationClassName="top-[64%]">
+    <AuthFlowLayout>
       {resetPasswordMutation.isSuccess ? (
         <AuthCard size="compact">
               <button
