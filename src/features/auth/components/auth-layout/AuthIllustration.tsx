@@ -10,7 +10,7 @@ type AuthIllustrationProps = {
 
 const variantClasses: Record<AuthIllustrationVariant, string> = {
   default:
-    "right-[-6%] top-[56%] w-[420px] max-w-[40vw] -translate-y-1/2",
+    "right-[-6%] top-[58%] w-[420px] max-w-[40vw] -translate-y-1/2",
 
   compact:
     "right-[-4%] top-[67%] w-[360px] max-w-[34vw] -translate-y-1/2",
