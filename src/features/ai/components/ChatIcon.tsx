@@ -143,7 +143,7 @@ function ChatIcon() {
                             whileHover="expanded"
                             variants={launcherVariants}
                             style={{ height: LAUNCHER_SIZE }}
-                            className="relative flex items-center overflow-visible rounded-full pr-4 hover:bg-white/90 hover:shadow-lg hover:backdrop-blur"
+                            className="relative flex items-center mt-[-10rem] overflow-visible rounded-full pr-4 hover:bg-white/90 hover:shadow-lg hover:backdrop-blur"
                         >
                             <motion.div
                                 variants={actionsVariants}
