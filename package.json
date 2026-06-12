@@ -16,6 +16,7 @@
     "@fortawesome/react-fontawesome": "^3.0.2",
     "@gsap/react": "^2.1.2",
     "@lottiefiles/dotlottie-react": "^0.17.1",
+    "@microsoft/signalr": "^10.0.0",
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.3.0",
     "@tailwindcss/vite": "^4.1.13",

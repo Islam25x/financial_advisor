@@ -7,6 +7,7 @@ import type {
 } from "../../../shared/chart/DoughnutChartBase";
 import { Card, Text } from "../../../shared/ui";
 import { useDashboard } from "../hooks/useDashboard";
+import type { DashboardExpenseBreakdownItem } from "../types/dashboard.models";
 
 const CHART_COLORS = [
   "#6366F1",
@@ -17,20 +18,23 @@ const CHART_COLORS = [
   "#8B5CF6",
 ];
 
+const EMPTY_EXPENSE_BREAKDOWN: DashboardExpenseBreakdownItem[] = [];
+
+const amountFormatter = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0,
+});
+
 const BudgetDoughnutChart = memo(() => {
   const { data: dashboard } = useDashboard();
 
-  const expenseBreakdown = dashboard?.expenseBreakdown ?? [];
+  const expenseBreakdown = dashboard?.expenseBreakdown ?? EMPTY_EXPENSE_BREAKDOWN;
 
   const totalExpenses = dashboard?.totalExpense ?? 0;
 
   const hasExpenseData = expenseBreakdown.length > 0;
 
   const formattedTotalExpenses = useMemo(
-    () =>
-      new Intl.NumberFormat("en-US", {
-        maximumFractionDigits: 0,
-      }).format(totalExpenses),
+    () => amountFormatter.format(totalExpenses),
     [totalExpenses],
   );
 
@@ -77,6 +81,7 @@ const BudgetDoughnutChart = memo(() => {
   const legendItems = useMemo(
     () =>
       expenseBreakdown.map((item, index) => {
+        const color = CHART_COLORS[index % CHART_COLORS.length];
         const percentage =
           totalExpenses > 0
             ? Math.round((item.amount / totalExpenses) * 100)
@@ -86,10 +91,15 @@ const BudgetDoughnutChart = memo(() => {
           label: item.categoryName,
           value: item.amount,
           percentage,
+          color,
 
           dotStyle: {
-            backgroundColor:
-              CHART_COLORS[index % CHART_COLORS.length],
+            backgroundColor: color,
+          } as CSSProperties,
+          percentageStyle: {
+            color,
+            borderColor: `${color}25`,
+            backgroundColor: `${color}10`,
           } as CSSProperties,
         };
       }),
@@ -119,7 +129,7 @@ const BudgetDoughnutChart = memo(() => {
             </Text>
           </div>
         ) : (
-          <ul className="space-y-1.5">
+          <ul className="scrollbar-clean max-h-55 space-y-1.5 overflow-y-auto overflow-x-hidden pr-1.5">
             {legendItems.map((item, index) => (
               <li
                 key={`${item.label}-${index}`}
@@ -138,23 +148,12 @@ const BudgetDoughnutChart = memo(() => {
 
                 <div className="flex items-center gap-3">
                   <span className="text-[11px] font-semibold text-slate-900">
-                    {new Intl.NumberFormat("en-US", {
-                      maximumFractionDigits: 0,
-                    }).format(item.value)}
+                    {amountFormatter.format(item.value)}
                   </span>
 
                   <span
                     className="rounded-md border px-1.5 py-[2px] text-[9px] font-semibold"
-                    style={{
-                      color:
-                        CHART_COLORS[index % CHART_COLORS.length],
-
-                      borderColor:
-                        `${CHART_COLORS[index % CHART_COLORS.length]}25`,
-
-                      backgroundColor:
-                        `${CHART_COLORS[index % CHART_COLORS.length]}10`,
-                    }}
+                    style={item.percentageStyle}
                   >
                     {item.percentage}%
                   </span>

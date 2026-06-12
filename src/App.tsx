@@ -4,6 +4,7 @@ import "aos/dist/aos.css";
 import AppRoutes from "./routes/AppRoutes";
 import { DateRangeProvider, ToastProvider } from "./shared/ui";
 import { AuthProvider } from "./shared/auth/AuthProvider";
+import { NotificationsRealtimeBridge } from "./features/notifications/components/NotificationsRealtimeBridge";
 
 function App() {
   useEffect(() => {
@@ -13,6 +14,7 @@ function App() {
   return (
     <AuthProvider>
       <ToastProvider>
+        <NotificationsRealtimeBridge />
         <DateRangeProvider>
           <AppRoutes />
         </DateRangeProvider>

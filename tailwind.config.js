@@ -6,6 +6,7 @@ export default {
       colors: {
         primary: "var(--color-primary)",
         "primary-hover": "var(--color-primary-hover)",
+        danger: "var(--color-danger)",
         background: "var(--color-bg)",
         surface: "var(--color-surface)",
         "text-primary": "var(--color-text-primary)",

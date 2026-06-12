@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Bell } from "lucide-react";
-import Button from "./Button";
 import DateRangeSelector from "./DateRangeSelector";
 import Text from "./Text";
+import { NotificationBell } from "../../features/notifications/components/NotificationBell";
 import { useUserProfile } from "../../features/user/hooks/useUserProfile";
 import {
   getUserDisplayName,
@@ -23,15 +22,7 @@ function TopHeaderBar() {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Button
-        variant="secondary"
-        size="sm"
-        shape="circle"
-        className="text-black h-11 w-11 p-0 border-gray-400 border-solid border-1 hover:bg-primary-700 hover:text-white"
-        aria-label="Notifications"
-      >
-        <Bell size={18} />
-      </Button>
+      <NotificationBell />
       <DateRangeSelector />
       <div className="flex min-h-[52px] min-w-[230px] items-center gap-3 rounded-[28px] border border-slate-200 bg-white/95 px-3 py-2 shadow-[0_12px_30px_rgba(15,23,42,0.08)] backdrop-blur">
         {imageUrl ? (

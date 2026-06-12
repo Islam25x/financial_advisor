@@ -5,6 +5,7 @@ const DASHBOARD_QUERY_KEY = ["dashboard"] as const;
 const TRANSACTIONS_QUERY_KEY = ["transactions"] as const;
 const GOALS_QUERY_KEY = ["goals"] as const;
 const SAVING_PLANS_QUERY_KEY = ["saving-plans"] as const;
+const NOTIFICATIONS_QUERY_KEY = ["notifications"] as const;
 
 export const queryKeys = {
   auth: {
@@ -64,5 +65,10 @@ export const queryKeys = {
   },
   ai: {
     chatMessages: ["chat", "messages"] as const,
+  },
+  notifications: {
+    all: NOTIFICATIONS_QUERY_KEY,
+    list: [...NOTIFICATIONS_QUERY_KEY, "list"] as const,
+    unreadCount: [...NOTIFICATIONS_QUERY_KEY, "unread-count"] as const,
   },
 } as const;

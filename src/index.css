@@ -10,6 +10,7 @@
   --color-primary-600: #0284c7;
   --color-primary-700: #0369a1;
   --color-primary-hover: #0369a1;
+  --color-danger: #dc2626;
 
   --color-skyAccent: #38bef8;
   --color-bg: #f6f4ff;
@@ -90,6 +91,26 @@
   }
   .form{
     @apply bg-white/20 border border-white/30 backdrop-blur-lg p-8 rounded-2xl shadow-2xl
+  }
+}
+
+@layer utilities {
+  .scrollbar-clean {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(203 213 225) transparent;
+  }
+
+  .scrollbar-clean::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-clean::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-clean::-webkit-scrollbar-thumb {
+    background-color: rgb(203 213 225);
+    border-radius: 9999px;
   }
 }
 
