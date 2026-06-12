@@ -16,7 +16,6 @@ import { useMarkNotificationAsRead } from "../hooks/useMarkNotificationAsRead";
 import { useNotifications } from "../hooks/useNotifications";
 import { useUnreadNotificationsCount } from "../hooks/useUnreadNotificationsCount";
 import type { Notification } from "../types/notification.types";
-import { formatNotificationRelativeTime } from "../utils/notification.formatters";
 
 const UNREAD_NOTIFICATION_FILTERS = {
   isRead: false,
@@ -75,9 +74,6 @@ function NotificationItem({
             </Text>
             <Text variant="caption" className="mt-1 line-clamp-2 text-text-secondary">
               {notification.message}
-            </Text>
-            <Text variant="caption" className="mt-2 text-text-muted">
-              {formatNotificationRelativeTime(notification.createdAt)}
             </Text>
           </div>
         </div>
