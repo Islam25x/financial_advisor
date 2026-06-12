@@ -7,7 +7,6 @@ import {
   BarChart3,
   PiggyBank,
   Settings,
-  HelpCircle,
   LogOut,
 } from "lucide-react";
 import logoSrc from "../../../assets/logo.png";
@@ -39,7 +38,6 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
     link?: string;
     onClick?: () => void;
   }[] = [
-      { name: "Help", icon: HelpCircle, link: "/support" },
       {
         name: "Log out",
         icon: LogOut,
