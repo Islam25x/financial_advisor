@@ -44,8 +44,8 @@ export function NotificationsRealtimeBridge() {
       try {
         const notification = parseNotificationDto(payload);
 
-        queryClient.setQueryData<Notification[]>(
-          queryKeys.notifications.list,
+        queryClient.setQueriesData<Notification[]>(
+          { queryKey: queryKeys.notifications.listRoot },
           (current) => upsertNotification(current, notification),
         );
 
@@ -64,7 +64,7 @@ export function NotificationsRealtimeBridge() {
           console.warn("[notifications] SignalR payload was invalid.", error);
         }
 
-        void queryClient.invalidateQueries({ queryKey: queryKeys.notifications.list });
+        void queryClient.invalidateQueries({ queryKey: queryKeys.notifications.listRoot });
         void queryClient.invalidateQueries({ queryKey: queryKeys.notifications.unreadCount });
       }
     };

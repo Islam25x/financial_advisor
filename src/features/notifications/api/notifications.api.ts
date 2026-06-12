@@ -1,8 +1,42 @@
 import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import { requestJson } from "../../../infrastructure/api/http";
 
-export async function getNotificationsApi(options?: { signal?: AbortSignal }): Promise<unknown> {
-  return requestJson<unknown>("/api/notifications", {
+export type NotificationListFilters = {
+  isRead?: boolean;
+  pageNumber?: number;
+  pageSize?: number;
+  sortDirection?: "Asc" | "Desc";
+};
+
+function buildNotificationsPath(filters?: NotificationListFilters): string {
+  const params = new URLSearchParams();
+
+  if (typeof filters?.isRead === "boolean") {
+    params.set("IsRead", String(filters.isRead));
+  }
+
+  if (typeof filters?.pageNumber === "number") {
+    params.set("PageNumber", String(filters.pageNumber));
+  }
+
+  if (typeof filters?.pageSize === "number") {
+    params.set("PageSize", String(filters.pageSize));
+  }
+
+  if (filters?.sortDirection) {
+    params.set("SortDirection", filters.sortDirection);
+  }
+
+  const queryString = params.toString();
+
+  return queryString ? `/api/notifications?${queryString}` : "/api/notifications";
+}
+
+export async function getNotificationsApi(
+  filters?: NotificationListFilters,
+  options?: { signal?: AbortSignal },
+): Promise<unknown> {
+  return requestJson<unknown>(buildNotificationsPath(filters), {
     method: "GET",
     signal: options?.signal,
     baseUrl: getAppApiBaseUrl(),
@@ -43,4 +77,3 @@ export async function markAllNotificationsAsReadApi(
     withAuth: true,
   });
 }
-

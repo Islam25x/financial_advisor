@@ -197,7 +197,10 @@ function SavingPlanModal({ isOpen, onClose }: SavingPlanModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="saving-plan-modal-title"
-        className="w-full max-w-[940px] overflow-hidden rounded-3xl border border-border bg-surface text-text-secondary shadow-[0_24px_60px_rgba(15,23,42,0.18)]"
+        className={cn(
+          "w-full overflow-hidden rounded-3xl border border-border bg-surface text-text-secondary shadow-[0_24px_60px_rgba(15,23,42,0.18)]",
+          isPreview ? "max-w-[1460px]" : "max-w-[760px]",
+        )}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="px-5 py-4 sm:px-7">

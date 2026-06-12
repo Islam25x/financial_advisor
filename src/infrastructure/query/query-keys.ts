@@ -68,7 +68,21 @@ export const queryKeys = {
   },
   notifications: {
     all: NOTIFICATIONS_QUERY_KEY,
-    list: [...NOTIFICATIONS_QUERY_KEY, "list"] as const,
+    listRoot: [...NOTIFICATIONS_QUERY_KEY, "list"] as const,
+    list: (filters?: {
+      isRead?: boolean;
+      pageNumber?: number;
+      pageSize?: number;
+      sortDirection?: "Asc" | "Desc";
+    }) =>
+      [
+        ...NOTIFICATIONS_QUERY_KEY,
+        "list",
+        filters?.isRead ?? null,
+        filters?.pageNumber ?? null,
+        filters?.pageSize ?? null,
+        filters?.sortDirection ?? null,
+      ] as const,
     unreadCount: [...NOTIFICATIONS_QUERY_KEY, "unread-count"] as const,
   },
 } as const;

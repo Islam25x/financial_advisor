@@ -162,12 +162,22 @@ function mapStatus(value: number | string | null | undefined): string | undefine
 function mapItems(items: BackendSavingPlanResponseDto["items"]): SavingPlanItemDto[] {
   return (items ?? []).reduce<SavingPlanItemDto[]>((mappedItems, item) => {
     const category = toOptionalString(item.category) ?? toOptionalString(item.categoryName);
-    const recommendedAmount = toOptionalNumber(item.recommendedAmount);
+    const recommendedBudget =
+      toOptionalNumber(item.recommendedBudget) ??
+      toOptionalNumber(item.recommendedAmount);
 
-    if (category && recommendedAmount !== undefined) {
+    if (category && recommendedBudget !== undefined) {
       mappedItems.push({
         Category: category,
-        RecommendedAmount: recommendedAmount,
+        RecommendedAmount: recommendedBudget,
+        CategoryType: toOptionalString(item.categoryType),
+        CurrentAverage: toOptionalNumber(item.currentAverage),
+        RecommendedBudget: recommendedBudget,
+        ReductionPercentage:
+          toOptionalNumber(item.reductionPercentage) ??
+          toOptionalNumber(item.reductionPercent),
+        ExpectedSaving: toOptionalNumber(item.expectedSaving),
+        Reason: toOptionalString(item.reason),
       });
     }
 
@@ -215,6 +225,7 @@ function mapBackendSavingPlanResponse(dto: BackendSavingPlanResponseDto): Saving
     ForecastedSaving: toOptionalNumber(dto.forecastedSaving),
     AnalysisPeriodMonths: analysisPeriodMonths,
     PlanDifficulty: mapDifficulty(dto.difficulty),
+    PlanStatusLabel: toOptionalString(dto.planStatusLabel),
     Status: mapStatus(dto.status),
     AppliedAt: dto.appliedAt ?? null,
     SummaryMessage: toOptionalString(dto.summaryMessage),

@@ -18,6 +18,12 @@ import { useUnreadNotificationsCount } from "../hooks/useUnreadNotificationsCoun
 import type { Notification } from "../types/notification.types";
 import { formatNotificationRelativeTime } from "../utils/notification.formatters";
 
+const UNREAD_NOTIFICATION_FILTERS = {
+  isRead: false,
+  pageSize: 4,
+  sortDirection: "Desc",
+} as const;
+
 function getNotificationIcon(type: string, severity: string): LucideIcon {
   const normalizedType = type.toLowerCase();
   const normalizedSeverity = severity.toLowerCase();
@@ -158,7 +164,7 @@ export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const { data: unreadCount = 0 } = useUnreadNotificationsCount();
-  const { data: notifications = [] } = useNotifications();
+  const { data: notifications = [] } = useNotifications(UNREAD_NOTIFICATION_FILTERS);
   const markAsReadMutation = useMarkNotificationAsRead();
   const markAllAsReadMutation = useMarkAllNotificationsAsRead();
 

@@ -13,7 +13,14 @@ export const GenerateSavingPlanRequestSchema = z.object({
 export const BackendSavingPlanItemSchema = z.object({
   category: z.string().optional().nullable(),
   categoryName: z.string().optional().nullable(),
+  categoryType: NullableStringSchema,
+  currentAverage: NullableNumberSchema,
   recommendedAmount: NullableNumberSchema,
+  recommendedBudget: NullableNumberSchema,
+  reductionPercentage: NullableNumberSchema,
+  reductionPercent: NullableNumberSchema,
+  expectedSaving: NullableNumberSchema,
+  reason: NullableStringSchema,
 });
 
 export const BackendSavingPlanResponseSchema = z.object({
@@ -46,6 +53,12 @@ export const BackendSavingPlanResponseSchema = z.object({
 export const SavingPlanItemSchema = z.object({
   Category: z.string(),
   RecommendedAmount: z.number().finite(),
+  CategoryType: z.string().optional(),
+  CurrentAverage: z.number().finite().optional(),
+  RecommendedBudget: z.number().finite().optional(),
+  ReductionPercentage: z.number().finite().optional(),
+  ExpectedSaving: z.number().finite().optional(),
+  Reason: z.string().optional(),
 });
 
 export const SavingPlanResponseSchema = z.object({

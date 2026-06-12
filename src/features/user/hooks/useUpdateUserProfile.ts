@@ -17,11 +17,13 @@ export interface UpdateUserProfileInput {
 }
 
 function mapInputToRequestDto(input: UpdateUserProfileInput): UpdateUserProfileRequestDto {
+  const dateOfBirth = input.dateOfBirth.trim();
+
   return {
     firstName: input.firstName.trim(),
     lastName: input.lastName.trim(),
     phoneNumber: input.phoneNumber.trim(),
-    dateOfBirth: input.dateOfBirth,
+    dateOfBirth: dateOfBirth || null,
   };
 }
 

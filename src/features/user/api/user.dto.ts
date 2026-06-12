@@ -13,7 +13,7 @@ export interface UpdateUserProfileRequestDto {
   firstName: string;
   lastName: string;
   phoneNumber: string;
-  dateOfBirth: string;
+  dateOfBirth: string | null;
 }
 
 export interface UpdateUserProfileResponseDto {

@@ -1,15 +1,34 @@
+import { useState } from "react";
+import type { LucideIcon } from "lucide-react";
 import {
   AlertTriangle,
+  BarChart3,
   CalendarDays,
   Check,
+  ChevronDown,
+  ChevronUp,
+  Gauge,
+  Landmark,
+  LineChart,
   PiggyBank,
-  Star,
+  ShieldCheck,
+  Sparkles,
   Target,
+  TrendingDown,
   TrendingUp,
   Wallet,
 } from "lucide-react";
 import { Button, Card, Text, cn } from "../../../../shared/ui";
-import type { SavingPlanResponseDto } from "../../api/saving-plan.dto";
+import type {
+  SavingPlanItemDto,
+  SavingPlanResponseDto,
+} from "../../api/saving-plan.dto";
+import {
+  formatSavingPlanCurrency,
+  formatSavingPlanCurrencyDifference,
+  formatSavingPlanDuration,
+  formatSavingPlanPercentage,
+} from "../../utils/saving-plan.formatters";
 
 type SavingPlanPreviewProps = {
   plan: SavingPlanResponseDto;
@@ -20,68 +39,247 @@ type SavingPlanPreviewProps = {
   onApply: () => void;
 };
 
-function formatCurrency(value?: number): string {
-  if (value === undefined) {
-    return "-";
-  }
-
-  return new Intl.NumberFormat("en-US", {
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-function formatOpportunity(value?: number): string {
-  if (value === undefined) {
-    return "-";
-  }
-
-  return `+${formatCurrency(value)}`;
-}
-
-function formatDateRange(startDate?: string | null, endDate?: string | null): string | null {
-  if (!startDate && !endDate) {
-    return null;
-  }
-
-  if (startDate && endDate) {
-    return `${startDate} - ${endDate}`;
-  }
-
-  return startDate ?? endDate ?? null;
-}
-
-type SummaryCardProps = {
+type ReportMetricCardProps = {
   label: string;
   value: string;
-  suffix?: string;
-  helper?: string;
-  icon: typeof Wallet;
+  helper: string;
+  icon: LucideIcon;
   tone: string;
 };
 
-function SummaryCard({ label, value, suffix, helper, icon: Icon, tone }: SummaryCardProps) {
+type OverviewItemProps = {
+  label: string;
+  value: string;
+  icon: LucideIcon;
+};
+
+function ReportMetricCard({
+  label,
+  value,
+  helper,
+  icon: Icon,
+  tone,
+}: ReportMetricCardProps) {
   return (
-    <Card padding="sm" className="min-h-[128px]">
-      <div className="flex items-start gap-3">
-        <span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-full", tone)}>
-          <Icon size={21} aria-hidden="true" />
-        </span>
-        <div className="min-w-0">
-          <Text variant="body" className="text-text-secondary">
+    <Card padding="sm" className="min-h-[146px]">
+      <div className="flex h-full flex-col">
+        <div className="flex items-start gap-3">
+          <span className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-full", tone)}>
+            <Icon size={21} aria-hidden="true" />
+          </span>
+          <Text variant="body" className="min-w-0 text-text-secondary">
             {label}
           </Text>
-          <div className="mt-4 flex items-end gap-1.5">
-            <span className="text-2xl font-bold text-text-primary">{value}</span>
-            {suffix && <span className="pb-1 text-xs font-bold text-text-primary">{suffix}</span>}
-          </div>
-          {helper && (
-            <Text variant="caption" className="mt-3 text-text-secondary">
-              {helper}
-            </Text>
-          )}
         </div>
+        <Text as="p" className="mt-5 text-2xl font-bold tracking-tight text-text-primary">
+          {value}
+        </Text>
+        <Text variant="caption" className="mt-auto pt-4 text-text-secondary">
+          {helper}
+        </Text>
       </div>
     </Card>
+  );
+}
+
+function OverviewItem({ label, value, icon: Icon }: OverviewItemProps) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <Icon size={18} aria-hidden="true" />
+      </span>
+      <div className="min-w-0">
+        <Text variant="caption" className="text-text-secondary">
+          {label}
+        </Text>
+        <Text variant="body" weight="bold" className="truncate text-text-primary">
+          {value}
+        </Text>
+      </div>
+    </div>
+  );
+}
+
+function ForecastItem({
+  label,
+  value,
+  icon: Icon,
+  tone,
+}: {
+  label: string;
+  value: string;
+  icon: LucideIcon;
+  tone: string;
+}) {
+  return (
+    <div className="flex min-w-0 items-center gap-4 lg:border-r lg:border-border lg:last:border-r-0">
+      <span className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-full", tone)}>
+        <Icon size={21} aria-hidden="true" />
+      </span>
+      <div className="min-w-0">
+        <Text variant="body" className="text-text-secondary">
+          {label}
+        </Text>
+        <Text as="p" className="mt-2 text-2xl font-bold tracking-tight text-text-primary">
+          {value}
+        </Text>
+        <Text variant="caption" className="mt-1 text-text-secondary">
+          Total
+        </Text>
+      </div>
+    </div>
+  );
+}
+
+function SavingOpportunityDesktopRow({
+  item,
+  isExpanded,
+  onToggle,
+}: {
+  item: SavingPlanItemDto;
+  isExpanded: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <>
+      <tr className="border-b border-border last:border-b-0">
+        <td className="px-4 py-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+              <PiggyBank size={17} aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <Text variant="caption" weight="bold" className="truncate text-text-primary">
+                {item.Category}
+              </Text>
+            </div>
+          </div>
+        </td>
+        <td className="px-4 py-3 text-sm text-text-secondary">{item.CategoryType ?? "-"}</td>
+        <td className="px-4 py-3 text-sm font-semibold text-text-primary">
+          {formatSavingPlanCurrency(item.CurrentAverage)}
+        </td>
+        <td className="px-4 py-3 text-sm font-semibold text-text-primary">
+          {formatSavingPlanCurrency(item.RecommendedBudget)}
+        </td>
+        <td className="px-4 py-3 text-sm font-semibold text-orange-600">
+          {formatSavingPlanPercentage(item.ReductionPercentage)}
+        </td>
+        <td className="px-4 py-3 text-sm font-semibold text-emerald-600">
+          {formatSavingPlanCurrency(item.ExpectedSaving)}
+        </td>
+        <td className="px-3 py-3 text-right">
+          {item.Reason && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              shape="circle"
+              className="h-8 w-8"
+              onClick={onToggle}
+              aria-label={`${isExpanded ? "Collapse" : "Expand"} ${item.Category} reason`}
+            >
+              {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </Button>
+          )}
+        </td>
+      </tr>
+      {isExpanded && item.Reason && (
+        <tr>
+          <td colSpan={7} className="px-4 pb-3">
+            <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-sky-900">
+              <span className="font-semibold">Reason: </span>
+              {item.Reason}
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
+  );
+}
+
+function SavingOpportunityMobileCard({
+  item,
+  isExpanded,
+  onToggle,
+}: {
+  item: SavingPlanItemDto;
+  isExpanded: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-surface p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+            <PiggyBank size={17} aria-hidden="true" />
+          </span>
+          <div className="min-w-0">
+            <Text variant="body" weight="bold" className="truncate text-text-primary">
+              {item.Category}
+            </Text>
+            <Text variant="caption" className="mt-0.5 text-text-secondary">
+              {item.CategoryType ?? "-"}
+            </Text>
+          </div>
+        </div>
+        {item.Reason && (
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            shape="circle"
+            className="h-8 w-8 shrink-0"
+            onClick={onToggle}
+            aria-label={`${isExpanded ? "Collapse" : "Expand"} ${item.Category} reason`}
+          >
+            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </Button>
+        )}
+      </div>
+
+      <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+        <div>
+          <Text variant="caption" className="text-text-secondary">
+            Current Avg.
+          </Text>
+          <Text variant="body" weight="bold" className="text-text-primary">
+            {formatSavingPlanCurrency(item.CurrentAverage)}
+          </Text>
+        </div>
+        <div>
+          <Text variant="caption" className="text-text-secondary">
+            Recommended
+          </Text>
+          <Text variant="body" weight="bold" className="text-text-primary">
+            {formatSavingPlanCurrency(item.RecommendedBudget)}
+          </Text>
+        </div>
+        <div>
+          <Text variant="caption" className="text-text-secondary">
+            Reduction
+          </Text>
+          <Text variant="body" weight="bold" className="text-orange-600">
+            {formatSavingPlanPercentage(item.ReductionPercentage)}
+          </Text>
+        </div>
+        <div>
+          <Text variant="caption" className="text-text-secondary">
+            Expected Saving
+          </Text>
+          <Text variant="body" weight="bold" className="text-emerald-600">
+            {formatSavingPlanCurrency(item.ExpectedSaving)}
+          </Text>
+        </div>
+      </div>
+
+      {isExpanded && item.Reason && (
+        <div className="mt-3 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-sky-900">
+          <span className="font-semibold">Reason: </span>
+          {item.Reason}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -93,7 +291,21 @@ function SavingPlanPreview({
   onGenerateAgain,
   onApply,
 }: SavingPlanPreviewProps) {
-  const dateRange = formatDateRange(plan.StartDate, plan.EndDate);
+  const [expandedItemKeys, setExpandedItemKeys] = useState<Set<string>>(() => new Set());
+
+  const toggleItem = (itemKey: string) => {
+    setExpandedItemKeys((currentKeys) => {
+      const nextKeys = new Set(currentKeys);
+
+      if (nextKeys.has(itemKey)) {
+        nextKeys.delete(itemKey);
+      } else {
+        nextKeys.add(itemKey);
+      }
+
+      return nextKeys;
+    });
+  };
 
   return (
     <div>
@@ -105,143 +317,210 @@ function SavingPlanPreview({
             </div>
           )}
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <SummaryCard
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+            <ReportMetricCard
               label="Recommended Monthly Saving"
-              value={formatCurrency(plan.RecommendedMonthlySaving)}
+              value={formatSavingPlanCurrency(plan.RecommendedMonthlySaving)}
               helper="To achieve your goal"
               icon={Wallet}
               tone="bg-primary/10 text-primary"
             />
-            <SummaryCard
-              label="Current Average Saving"
-              value={formatCurrency(plan.CurrentAverageSaving)}
+            <ReportMetricCard
+              label="Current Monthly Saving"
+              value={formatSavingPlanCurrency(plan.CurrentAverageSaving)}
               helper="This month"
               icon={TrendingUp}
               tone="bg-emerald-100 text-emerald-600"
             />
-            <SummaryCard
-              label="Extra Saving Opportunity"
-              value={formatOpportunity(plan.ExtraSavingOpportunity)}
-              helper="You can save more"
-              icon={Star}
-              tone="bg-orange-100 text-orange-600"
+            <ReportMetricCard
+              label="Average Income"
+              value={formatSavingPlanCurrency(plan.AverageIncome)}
+              helper="Per month"
+              icon={Landmark}
+              tone="bg-violet-100 text-violet-600"
             />
-            <SummaryCard
-              label="Plan Difficulty"
-              value={plan.PlanDifficulty ?? "-"}
-              icon={CalendarDays}
-              tone="bg-sky-100 text-primary"
+            <ReportMetricCard
+              label="Average Expenses"
+              value={formatSavingPlanCurrency(plan.AverageExpenses)}
+              helper="Per month"
+              icon={TrendingDown}
+              tone="bg-rose-100 text-rose-600"
+            />
+            <ReportMetricCard
+              label="Forecasted Saving"
+              value={formatSavingPlanCurrency(plan.ForecastedSaving)}
+              helper="Next month"
+              icon={BarChart3}
+              tone="bg-blue-100 text-blue-600"
+            />
+            <ReportMetricCard
+              label="Potential Extra Savings"
+              value={formatSavingPlanCurrencyDifference(plan.ExtraSavingOpportunity)}
+              helper="You can save more"
+              icon={Sparkles}
+              tone="bg-orange-100 text-orange-600"
             />
           </div>
 
-          <Card padding="md" className="space-y-5">
-            <div className="grid gap-5 lg:grid-cols-2">
-              <section className="lg:border-r lg:border-border lg:pr-5">
-                <Text as="h3" variant="body" weight="bold">
-                  Plan Summary
+          <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
+            <Card padding="md">
+              <Text as="h3" variant="subtitle" weight="bold" className="text-text-primary">
+                AI Plan Overview
+              </Text>
+              {plan.SummaryMessage && (
+                <Text variant="body" className="mt-3 text-text-secondary">
+                  {plan.SummaryMessage}
                 </Text>
-                {plan.SummaryMessage && (
-                  <div className="mt-4 flex gap-3">
-                    <span className="text-3xl font-bold leading-none text-primary">"</span>
-                    <Text variant="body" className="max-w-sm text-text-secondary">
-                      {plan.SummaryMessage}
-                    </Text>
-                  </div>
-                )}
+              )}
+              <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                <OverviewItem
+                  label="Duration"
+                  value={formatSavingPlanDuration(plan.AnalysisPeriodMonths)}
+                  icon={CalendarDays}
+                />
+                <OverviewItem
+                  label="Plan Type"
+                  value={plan.PlanType}
+                  icon={Gauge}
+                />
+                <OverviewItem
+                  label="Difficulty"
+                  value={plan.PlanDifficulty ?? "-"}
+                  icon={BarChart3}
+                />
+                <OverviewItem
+                  label="Status"
+                  value={plan.Status ?? "-"}
+                  icon={LineChart}
+                />
+                <OverviewItem
+                  label="Plan Status"
+                  value={plan.PlanStatusLabel ?? "-"}
+                  icon={ShieldCheck}
+                />
+                <OverviewItem
+                  label="Monthly Target"
+                  value={`${formatSavingPlanCurrency(plan.RecommendedMonthlySaving)} / month`}
+                  icon={Target}
+                />
+              </div>
+            </Card>
 
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  <div className="flex items-start gap-3">
-                    <CalendarDays size={20} className="mt-1 shrink-0 text-text-secondary" />
-                    <div>
-                      <Text variant="caption" className="text-text-secondary">
-                        Duration
-                      </Text>
-                      <Text variant="body" weight="bold" className="text-text-primary">
-                        {plan.Duration ?? "-"}
-                      </Text>
-                      {dateRange && (
-                        <Text variant="caption" className="mt-1 text-text-secondary">
-                          {dateRange}
-                        </Text>
-                      )}
-                    </div>
-                  </div>
+            <Card padding="md">
+              <Text as="h3" variant="subtitle" weight="bold" className="text-text-primary">
+                Financial Forecast
+              </Text>
+              <div className="mt-7 grid gap-6 lg:grid-cols-3">
+                <ForecastItem
+                  label="Forecasted Income"
+                  value={formatSavingPlanCurrency(plan.ForecastedIncome)}
+                  icon={Landmark}
+                  tone="bg-emerald-100 text-emerald-600"
+                />
+                <ForecastItem
+                  label="Forecasted Expenses"
+                  value={formatSavingPlanCurrency(plan.ForecastedExpenses)}
+                  icon={Wallet}
+                  tone="bg-rose-100 text-rose-600"
+                />
+                <ForecastItem
+                  label="Forecasted Saving"
+                  value={formatSavingPlanCurrency(plan.ForecastedSaving)}
+                  icon={LineChart}
+                  tone="bg-blue-100 text-blue-600"
+                />
+              </div>
+            </Card>
+          </div>
 
-                  <div className="flex items-start gap-3">
-                    <Target size={20} className="mt-1 shrink-0 text-text-secondary" />
-                    <div>
-                      <Text variant="caption" className="text-text-secondary">
-                        Monthly Target
-                      </Text>
-                      <Text variant="body" weight="bold" className="text-text-primary">
-                        {formatCurrency(plan.TargetMonthlySaving)}
-                      </Text>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <section>
-                <Text as="h3" variant="body" weight="bold">
-                  What You'll Get
+          <div className="grid gap-4 xl:grid-cols-[0.9fr_1.55fr]">
+            <div className={cn("grid gap-4", plan.Warnings.length > 0 && "lg:grid-cols-2 xl:grid-cols-1")}>
+              <Card padding="md" className="border-emerald-100 bg-emerald-50/35">
+                <Text as="h3" variant="subtitle" weight="bold" className="text-text-primary">
+                  AI Insights
                 </Text>
-                <ul className="mt-4 space-y-3">
+                <ul className="mt-5 space-y-4">
                   {plan.Insights.map((insight) => (
-                    <li key={insight} className="flex items-center gap-3 text-sm text-text-secondary">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                    <li key={insight} className="flex gap-3 text-sm leading-6 text-text-secondary">
+                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                         <Check size={15} strokeWidth={2.4} aria-hidden="true" />
                       </span>
-                      {insight}
+                      <span>{insight}</span>
                     </li>
                   ))}
                 </ul>
-              </section>
+              </Card>
+
+              {plan.Warnings.length > 0 && (
+                <Card padding="md" className="border-amber-200 bg-amber-50/45">
+                  <Text as="h3" variant="subtitle" weight="bold" className="text-text-primary">
+                    Warnings
+                  </Text>
+                  <ul className="mt-5 space-y-4">
+                    {plan.Warnings.map((warning) => (
+                      <li key={warning} className="flex gap-3 text-sm leading-6 text-text-secondary">
+                        <AlertTriangle size={18} className="mt-0.5 shrink-0 text-orange-500" aria-hidden="true" />
+                        <span>{warning}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              )}
             </div>
 
-            {plan.Items.length > 0 && (
-              <section className="border-t border-border pt-4">
-                <Text as="h3" variant="body" weight="bold">
-                  Top Recommendations
-                </Text>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                  {plan.Items.map((item) => (
-                    <div
-                      key={`${item.Category}-${item.RecommendedAmount}`}
-                      className="flex items-center gap-3 rounded-xl border border-border bg-surface px-3 py-3"
-                    >
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                        <PiggyBank size={20} aria-hidden="true" />
-                      </span>
-                      <div className="min-w-0">
-                        <Text variant="caption" weight="bold" className="truncate text-text-primary">
-                          {item.Category}
-                        </Text>
-                        <Text variant="caption" className="mt-1 text-emerald-600">
-                          Save {formatCurrency(item.RecommendedAmount)} / month
-                        </Text>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+            <Card padding="md">
+              <Text as="h3" variant="body" weight="bold" className="text-text-primary">
+                Saving Opportunities
+              </Text>
 
-            {plan.Warnings.length > 0 && (
-              <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                <AlertTriangle size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
-                <div className="space-y-1">
-                  {plan.Warnings.map((warning) => (
-                    <p key={warning}>{warning}</p>
-                  ))}
-                </div>
+              <div className="mt-4 hidden overflow-x-auto rounded-xl border border-border md:block">
+                <table className="w-full min-w-[760px] border-collapse text-left">
+                  <thead className="bg-slate-50 text-xs font-semibold text-text-secondary">
+                    <tr>
+                      <th className="px-4 py-3">Category</th>
+                      <th className="px-4 py-3">Category Type</th>
+                      <th className="px-4 py-3">Current Avg.</th>
+                      <th className="px-4 py-3">Recommended Budget</th>
+                      <th className="px-4 py-3">Reduction %</th>
+                      <th className="px-4 py-3">Expected Saving</th>
+                      <th className="px-3 py-3" aria-label="Actions" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {plan.Items.map((item, index) => {
+                      const itemKey = `${item.Category}-${item.CategoryType ?? ""}-${index}`;
+                      return (
+                        <SavingOpportunityDesktopRow
+                          key={itemKey}
+                          item={item}
+                          isExpanded={expandedItemKeys.has(itemKey)}
+                          onToggle={() => toggleItem(itemKey)}
+                        />
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
-            )}
-          </Card>
+
+              <div className="mt-4 space-y-3 md:hidden">
+                {plan.Items.map((item, index) => {
+                  const itemKey = `${item.Category}-${item.CategoryType ?? ""}-${index}`;
+                  return (
+                    <SavingOpportunityMobileCard
+                      key={itemKey}
+                      item={item}
+                      isExpanded={expandedItemKeys.has(itemKey)}
+                      onToggle={() => toggleItem(itemKey)}
+                    />
+                  );
+                })}
+              </div>
+            </Card>
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-col-reverse gap-3 border-t border-border px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
+      <div className="sticky bottom-0 flex flex-col-reverse gap-3 border-t border-border bg-surface px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
         <Button
           type="button"
           variant="secondary"
