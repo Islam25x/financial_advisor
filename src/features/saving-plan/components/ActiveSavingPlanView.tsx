@@ -8,6 +8,8 @@ import {
   PiggyBank,
   Power,
   Sparkles,
+  Target,
+  TrendingUp,
   Wallet,
 } from "lucide-react";
 import type { SavingPlanResponseDto } from "../api/saving-plan.dto";
@@ -19,7 +21,7 @@ import {
   formatSavingPlanDate,
   formatSavingPlanDuration,
 } from "../utils/saving-plan.formatters";
-import { Button, Card, PageHeader, Text, TopHeaderBar, cn } from "../../../shared/ui";
+import { Button, Card, MetricCard, PageHeader, Text, TopHeaderBar, cn } from "../../../shared/ui";
 import MonthlyProgressChartCard from "./MonthlyProgressChartCard";
 import ThisMonthProgressCard from "./ThisMonthProgressCard";
 
@@ -27,6 +29,10 @@ type ActiveSavingPlanViewProps = {
   plan: SavingPlanResponseDto;
   onDeactivateClick: () => void;
 };
+
+function formatMetricCurrency(value: number | null | undefined): string {
+  return value === null || value === undefined ? "--" : formatSavingPlanCurrency(value);
+}
 
 function PlanDetailRow({
   icon: Icon,
@@ -98,6 +104,32 @@ function ActiveSavingPlanView({ plan, onDeactivateClick }: ActiveSavingPlanViewP
     plan.ExtraSavingOpportunity !== undefined && plan.ExtraSavingOpportunity > 0;
   const currentProgressQuery = useActiveSavingPlanProgress();
   const monthlyProgressQuery = useActiveSavingPlanMonthlyProgress();
+  const metricCards = [
+    {
+      title: "Current Monthly Saving",
+      value: formatMetricCurrency(plan.CurrentAverageSaving),
+      subtitle: "Average monthly saving",
+      icon: <Wallet className="text-green-500" size={18} aria-hidden="true" />,
+    },
+    {
+      title: "Recommended Saving",
+      value: formatMetricCurrency(plan.RecommendedMonthlySaving),
+      subtitle: "AI recommendation",
+      icon: <Target className="text-primary" size={18} aria-hidden="true" />,
+    },
+    {
+      title: "Forecast Saving",
+      value: formatMetricCurrency(plan.ForecastedSaving),
+      subtitle: "Expected after this plan",
+      icon: <TrendingUp className="text-purple-500" size={18} aria-hidden="true" />,
+    },
+    {
+      title: "Extra Saving Opportunity",
+      value: formatMetricCurrency(plan.ExtraSavingOpportunity),
+      subtitle: "Additional saving potential",
+      icon: <Sparkles className="text-orange-500" size={18} aria-hidden="true" />,
+    },
+  ];
 
   return (
     <div className="space-y-5">
@@ -120,6 +152,22 @@ function ActiveSavingPlanView({ plan, onDeactivateClick }: ActiveSavingPlanViewP
           </div>
         }
       />
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {metricCards.map((card) => (
+          <MetricCard
+            key={card.title}
+            title={card.title}
+            icon={card.icon}
+            value={card.value}
+            trendContent={
+              <Text variant="caption" className="text-text-secondary">
+                {card.subtitle}
+              </Text>
+            }
+          />
+        ))}
+      </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <Card padding="md" className="space-y-5">
