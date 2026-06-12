@@ -163,8 +163,6 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
         {/* 🔹 Bottom Nav */}
         <div
           className="absolute bottom-12 w-full flex flex-col items-center lg:items-start space-y-2"
-          data-aos="fade-up"
-          data-aos-once="true"
         >
           {bottomNav.map(({ name, icon, link, onClick }) =>
             renderNavItem(name, icon, link, onClick)
